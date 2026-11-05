@@ -35,3 +35,10 @@ out/
 
 ### VS Code ###
 .vscode/
+
+# Configuracion local y credenciales
+.env
+.env.*
+!.env.example
+*.dump
+*.backup
