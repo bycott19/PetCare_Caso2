@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Error')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('')}"></header>
+<main>
+    <div class="card vacio-card" style="max-width: 560px; margin: 40px auto 0;">
+        <span class="tile orange"><svg th:replace="~{fragments/icons :: alert}"></svg></span>
+        <h1 th:text="${titulo != null} ? ${titulo} : (${status == 404} ? 'Esta página no existe' : 'Algo salió mal')">
+            Algo salió mal
+        </h1>
+        <p th:text="${mensaje != null} ? ${mensaje} : (${status == 404} ? 'Revisa la dirección o vuelve al inicio.' : 'Intenta nuevamente en unos segundos.')">
+            Mensaje
+        </p>
+        <div class="acciones" style="justify-content: center;">
+            <a href="javascript:history.back()" class="btn o"><svg th:replace="~{fragments/icons :: arrow}"></svg>Volver</a>
+            <a th:href="@{/}" class="btn">Ir al inicio</a>
+        </div>
+    </div>
+</main>
+</body>
+</html>

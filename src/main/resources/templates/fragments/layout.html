@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:fragment="head(titulo)">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title th:text="${titulo} + ' · PetCare'">PetCare</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233ec9a7'%3E%3Cellipse cx='12' cy='16.4' rx='4.8' ry='4'/%3E%3Cellipse cx='5.4' cy='10.6' rx='2.1' ry='2.5'/%3E%3Cellipse cx='9.2' cy='6.2' rx='2.1' ry='2.5'/%3E%3Cellipse cx='14.8' cy='6.2' rx='2.1' ry='2.5'/%3E%3Cellipse cx='18.6' cy='10.6' rx='2.1' ry='2.5'/%3E%3C/svg%3E">
+    <link rel="stylesheet" th:href="@{/css/petcare.css}">
+</head>
+<body>
+<aside class="sidebar" th:fragment="header(activo)">
+    <a th:href="@{/}" class="logo"><i><svg th:replace="~{fragments/icons :: paw}"></svg></i><span>Pet<b>Care</b></span></a>
+    <nav>
+        <a th:href="@{/}" th:classappend="${activo == 'inicio'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: home}"></svg><span>Inicio</span></a>
+        <a th:href="@{/clientes}" th:classappend="${activo == 'clientes'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: users}"></svg><span>Clientes</span></a>
+        <a th:href="@{/mascotas}" th:classappend="${activo == 'mascotas'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: paw}"></svg><span>Mascotas</span></a>
+        <a th:href="@{/veterinarios}" th:classappend="${activo == 'veterinarios'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: steth}"></svg><span>Veterinarios</span></a>
+    </nav>
+</aside>
+<th:block th:fragment="alertas">
+    <div class="alert ok" th:if="${exito}" th:text="${exito}"></div>
+    <div class="alert er" th:if="${error}" th:text="${error}"></div>
+</th:block>
+</body>
+</html>

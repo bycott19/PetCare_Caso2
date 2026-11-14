@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head(${cliente.nombre})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('clientes')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile orange"><svg th:replace="~{fragments/icons :: users}"></svg></span>
+            <div>
+                <h1>Ficha del cliente</h1>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/clientes}" class="btn o"><svg th:replace="~{fragments/icons :: arrow}"></svg>Volver a clientes</a>
+        </div>
+    </div>
+    <div class="card perfil">
+        <div class="perfil-color">
+            <span class="av big" th:text="${cliente.iniciales}">CR</span>
+        </div>
+        <div class="perfil-info">
+            <h2 th:text="${cliente.nombre}">Camila Rojas</h2>
+            <dl>
+                <div><dt>RUT</dt><dd th:text="${cliente.rut}">19456789-8</dd></div>
+                <div><dt>Correo</dt><dd th:text="${cliente.correo}">correo</dd></div>
+                <div><dt>Teléfono</dt><dd th:text="${cliente.telefono}">tel</dd></div>
+            </dl>
+        </div>
+        <div class="perfil-acciones">
+            <a th:href="@{/clientes/{id}/editar(id=${cliente.id})}" class="btn o">Editar datos</a>
+            <form th:action="@{/clientes/{id}/eliminar(id=${cliente.id})}" method="post"
+                  onsubmit="return confirm('¿Seguro que deseas eliminar este cliente?')">
+                <button type="submit" class="btn danger">Eliminar cliente</button>
+            </form>
+        </div>
+    </div>
+    <div>
+            <div class="sec-head">
+                <h2 th:text="'Mascotas (' + ${#lists.size(mascotas)} + ')'">Mascotas</h2>
+                <a th:href="@{/mascotas/nueva(clienteId=${cliente.id})}" class="btn">+ Agregar mascota</a>
+            </div>
+            <div class="card vacio-card" th:if="${#lists.isEmpty(mascotas)}">
+                <span class="tile mint"><svg th:replace="~{fragments/icons :: paw}"></svg></span>
+                <h3>Este cliente aún no tiene mascotas</h3>
+                <a th:href="@{/mascotas/nueva(clienteId=${cliente.id})}" class="btn p">+ Registrar mascota</a>
+            </div>
+            <div class="cards" th:unless="${#lists.isEmpty(mascotas)}">
+                <div class="card pet-card" th:each="m : ${mascotas}">
+                    <div class="pet-head">
+                        <span class="av big" th:classappend="${m.tipo}"><svg th:replace="~{fragments/icons :: paw}"></svg></span>
+                        <div>
+                            <h3 th:text="${m.nombre}">Luna</h3>
+                            <div class="sub" th:text="${m.especie} + ' · ' + ${m.raza}">Perro · Mestiza</div>
+                        </div>
+                    </div>
+                    <dl class="stats">
+                        <div><dt>Edad</dt><dd th:text="${m.edad}">2 años</dd></div>
+                        <div><dt>Peso</dt><dd th:text="${m.peso.stripTrailingZeros().toPlainString()} + ' kg'">12.5 kg</dd></div>
+                        <div><dt>Nacimiento</dt><dd th:text="${#temporals.format(m.fechaNacimiento, 'dd/MM/yyyy')}">01/01/2022</dd></div>
+                    </dl>
+                    <div class="btn-row" style="justify-content: flex-end;">
+                        <a th:href="@{/mascotas/{id}/editar(id=${m.id})}" class="btn o sm">Editar</a>
+                        <form th:action="@{/mascotas/{id}/eliminar(id=${m.id})}" method="post"
+                              onsubmit="return confirm('¿Seguro que deseas eliminar esta mascota?')">
+                            <input type="hidden" name="volver" th:value="@{/clientes/{id}(id=${cliente.id})}">
+                            <button type="submit" class="btn danger sm">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+    </div>
+</main>
+</body>
+</html>

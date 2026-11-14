@@ -1,24 +1,27 @@
-# PetCare - Caso 2
+# PetCare - Sistema de Gestión de Atención Veterinaria
 
 ## Integrantes
 
 - Javier Baeza Toro
 - Bairon Muñoz Sepúlveda
 
-## Estructura
+## Descripción
+
+Sistema web desarrollado con Spring Boot y PostgreSQL para la administración de atención veterinaria (clientes, mascotas, veterinarios y citas), complementado con un microservicio en Node.js para servicios externos (catálogo de medicamentos, notificaciones y geolocalización).
+
+## Estructura del Proyecto
 
 ```text
 PetCare_Caso2/
-├── docker-compose.yml
-├── .env.example
-├── build.gradle
-├── settings.gradle
-├── gradlew
-├── gradlew.bat
-└── src/
+├── docker-compose.yml          # Configuración de base de datos PostgreSQL
+├── .env.example                # Plantilla de variables de entorno
+├── build.gradle                # Dependencias y configuración de Gradle
+├── PetCare_Caso2_Api/          # Microservicio en Node.js (APIs externas)
+│   ├── package.json
+│   └── src/
+└── src/                        # Backend principal en Spring Boot
     ├── main/
     │   ├── java/cl/baeza_munoz/PetCare_Caso2/
-    │   │   ├── PetCareCaso2Application.java
     │   │   ├── controller/
     │   │   ├── dto/
     │   │   ├── exception/
@@ -28,16 +31,32 @@ PetCare_Caso2/
     │   └── resources/
     │       ├── application.properties
     │       ├── schema.sql
-    │       └── data.sql
+    │       ├── data.sql
+    │       ├── static/
+    │       └── templates/
     └── test/
 ```
 
-## Ejecutar
+## Instrucciones de Ejecución
 
-1. Copiar .env.example como .env y completar las credenciales sin comillas. Si ya existe .env, conservarlo.
-2. Con Docker Desktop abierto, ejecutar desde la raiz: `docker compose up -d`.
-3. Ejecutar `.\gradlew.bat bootRun` o iniciar la aplicacion desde el IDE con la raiz del proyecto como directorio de trabajo.
+### 1. Base de Datos (PostgreSQL)
+Asegurarse de tener Docker Desktop iniciado y ejecutar en la raíz:
+```bash
+docker compose up -d
+```
 
-En DBeaver, usar el host, puerto, base, usuario y contrasena del .env. Ese archivo esta excluido de Git.
+### 2. Backend Principal (Spring Boot)
+Copiar `.env.example` a `.env` si es necesario y ejecutar:
+```bash
+.\gradlew.bat bootRun
+```
+O iniciar la aplicación directamente desde el IDE (`PetCareCaso2Application.java`). La aplicación web estará disponible en `http://localhost:8081`.
 
-Los SQL se cargan solo al crear el volumen por primera vez. Para detener sin borrar datos: `docker compose down`. Cambiar la clave del .env no cambia la de una base ya creada.
+### 3. API Externa (Node.js)
+En una terminal separada:
+```bash
+cd PetCare_Caso2_Api
+npm install
+npm start
+```
+El microservicio escuchará en `http://localhost:3000`.

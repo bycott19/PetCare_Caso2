@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Clientes')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('clientes')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile orange"><svg th:replace="~{fragments/icons :: users}"></svg></span>
+            <div>
+                <h1>Clientes</h1>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/clientes/nuevo}" class="btn">+ Agregar cliente</a>
+        </div>
+    </div>
+    <div class="card">
+        <form th:action="@{/clientes}" method="get" class="card-tools">
+            <div class="buscador">
+                <svg th:replace="~{fragments/icons :: search}"></svg>
+                <input type="text" name="q" th:value="${q}" class="in" placeholder="Buscar por nombre, RUT o correo">
+            </div>
+            <button type="submit" class="btn o">Buscar</button>
+            <a th:if="${q != null and !#strings.isEmpty(q)}" th:href="@{/clientes}" class="btn o">Limpiar</a>
+            <span class="tag ok contador" th:text="${#lists.size(clientes)} + ' cliente(s)'">0 clientes</span>
+        </form>
+        <div class="tw">
+            <table>
+                <thead>
+                <tr>
+                    <th>Cliente</th>
+                    <th>RUT</th>
+                    <th>Contacto</th>
+                    <th class="cen">Mascotas</th>
+                    <th class="der">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(clientes)}">
+                    <td colspan="5" class="vacio"
+                        th:text="${q != null and !#strings.isEmpty(q)} ? 'No encontramos clientes con esa búsqueda' : 'Aún no hay clientes registrados'">
+                        Sin clientes
+                    </td>
+                </tr>
+                <tr th:each="c : ${clientes}">
+                    <td>
+                        <a th:href="@{/clientes/{id}(id=${c.id})}" class="persona enlace">
+                            <span class="av" th:text="${c.iniciales}">CR</span>
+                            <strong th:text="${c.nombre}">Nombre</strong>
+                        </a>
+                    </td>
+                    <td class="mono" th:text="${c.rut}">11111111-1</td>
+                    <td>
+                        <div th:text="${c.correo}">correo@mail.cl</div>
+                        <div class="sub" th:text="${c.telefono}">+56912345678</div>
+                    </td>
+                    <td class="cen">
+                        <span class="tag" th:classappend="${c.cantidadMascotas > 0} ? 'ok' : 'gr'"
+                              th:text="${c.cantidadMascotas}">2</span>
+                    </td>
+                    <td class="der">
+                        <div class="btn-row">
+                            <a th:href="@{/clientes/{id}(id=${c.id})}" class="btn m sm">Ver ficha</a>
+                            <a th:href="@{/clientes/{id}/editar(id=${c.id})}" class="btn o sm">Editar</a>
+                            <form th:action="@{/clientes/{id}/eliminar(id=${c.id})}" method="post"
+                                  onsubmit="return confirm('¿Seguro que deseas eliminar este cliente?')">
+                                <button type="submit" class="btn danger sm">Eliminar</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

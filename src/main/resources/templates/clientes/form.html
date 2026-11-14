@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head(${cliente.id == null ? 'Nuevo cliente' : 'Editar cliente'})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('clientes')}"></header>
+<main>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile orange"><svg th:replace="~{fragments/icons :: pencil}"></svg></span>
+            <div>
+                <h1 th:text="${cliente.id == null} ? 'Nuevo cliente' : 'Editar cliente'">Nuevo cliente</h1>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="${cliente.id == null} ? @{/clientes} : @{/clientes/{id}(id=${cliente.id})}" class="btn o">
+                <svg th:replace="~{fragments/icons :: arrow}"></svg>Volver</a>
+        </div>
+    </div>
+    <div class="form-layout">
+        <div class="card">
+            <form th:action="@{/clientes/guardar}" th:object="${cliente}" method="post" novalidate>
+                <input type="hidden" th:field="*{id}">
+                <div class="campo">
+                    <label for="nombre">Nombre completo</label>
+                    <input type="text" th:field="*{nombre}" class="fld" th:classappend="${#fields.hasErrors('nombre')} ? 'bad'"
+                           placeholder="Ej: Camila Rojas">
+                    <div class="err" th:if="${#fields.hasErrors('nombre')}" th:errors="*{nombre}"></div>
+                </div>
+                <div class="campo">
+                    <label for="rut">RUT</label>
+                    <input type="text" th:field="*{rut}" class="fld" th:classappend="${#fields.hasErrors('rut')} ? 'bad'"
+                           placeholder="Ej: 19.456.789-8">
+                    <div class="err" th:if="${#fields.hasErrors('rut')}" th:errors="*{rut}"></div>
+                </div>
+                <div class="dos">
+                    <div class="campo">
+                        <label for="correo">Correo electrónico</label>
+                        <input type="email" th:field="*{correo}" class="fld" th:classappend="${#fields.hasErrors('correo')} ? 'bad'"
+                               placeholder="camila@mail.cl">
+                        <div class="err" th:if="${#fields.hasErrors('correo')}" th:errors="*{correo}"></div>
+                    </div>
+                    <div class="campo">
+                        <label for="telefono">Teléfono</label>
+                        <input type="text" th:field="*{telefono}" class="fld" th:classappend="${#fields.hasErrors('telefono')} ? 'bad'"
+                               placeholder="+56 9 1234 5678">
+                        <div class="err" th:if="${#fields.hasErrors('telefono')}" th:errors="*{telefono}"></div>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <a th:href="${cliente.id == null} ? @{/clientes} : @{/clientes/{id}(id=${cliente.id})}" class="btn o">Cancelar</a>
+                    <button type="submit" class="btn p">Guardar cliente</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

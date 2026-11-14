@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Veterinarios')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('veterinarios')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile sky"><svg th:replace="~{fragments/icons :: steth}"></svg></span>
+            <div>
+                <h1>Veterinarios</h1>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/veterinarios/nuevo}" class="btn">+ Agregar veterinario</a>
+        </div>
+    </div>
+    <div class="card vacio-card" th:if="${#lists.isEmpty(veterinarios)}">
+        <span class="tile sky"><svg th:replace="~{fragments/icons :: steth}"></svg></span>
+        <h3>Aún no hay veterinarios registrados</h3>
+        <a th:href="@{/veterinarios/nuevo}" class="btn p">+ Agregar veterinario</a>
+    </div>
+    <div class="cards" th:unless="${#lists.isEmpty(veterinarios)}">
+        <div class="card vet-card" th:each="v : ${veterinarios}">
+            <span class="av big vet" th:text="${v.iniciales}">VP</span>
+            <div class="info">
+                <strong th:text="${v.nombre}">Dra. Pérez</strong>
+                <span class="sub">Médico veterinario</span>
+            </div>
+            <div class="btn-row">
+                <a th:href="@{/veterinarios/{id}/editar(id=${v.id})}" class="btn o sm">Editar</a>
+                <form th:action="@{/veterinarios/{id}/eliminar(id=${v.id})}" method="post"
+                      onsubmit="return confirm('¿Seguro que deseas eliminar este veterinario?')">
+                    <button type="submit" class="btn danger sm">Eliminar</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>
