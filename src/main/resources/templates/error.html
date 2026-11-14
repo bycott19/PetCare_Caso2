@@ -4,7 +4,7 @@
 <body>
 <header th:replace="~{fragments/layout :: header('')}"></header>
 <main>
-    <div class="card vacio-card" style="max-width: 560px; margin: 40px auto 0;">
+    <div class="card vacio-card" style="max-width: 560px; margin: 0 auto;">
         <span class="tile orange"><svg th:replace="~{fragments/icons :: alert}"></svg></span>
         <h1 th:text="${titulo != null} ? ${titulo} : (${status == 404} ? 'Esta página no existe' : 'Algo salió mal')">
             Algo salió mal
