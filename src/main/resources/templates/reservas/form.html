@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head(${reserva.id == null ? 'Pedir hora' : 'Modificar reserva'})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('reservas')}"></header>
+<main>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile lemon"><svg th:replace="~{fragments/icons :: calendar}"></svg></span>
+            <div>
+                <h1 th:text="${reserva.id == null ? 'Pedir hora para mascota' : 'Modificar reserva'}">Pedir hora</h1>
+                <p>Ingresa los detalles de la cita médica</p>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/reservas}" class="btn o"><svg th:replace="~{fragments/icons :: arrow}"></svg>Volver a reservas</a>
+        </div>
+    </div>
+
+    <div class="form-layout">
+        <div class="card">
+            <form th:action="@{/reservas/guardar}" th:object="${reserva}" method="post">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="alert er" th:if="${#fields.hasGlobalErrors()}">
+                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error global</p>
+                </div>
+
+                <div class="campo">
+                    <label for="mascotaId">Mascota paciente *</label>
+                    <select id="mascotaId" th:field="*{mascotaId}" class="fld" th:classappend="${#fields.hasErrors('mascotaId')} ? 'bad'">
+                        <option value="">Selecciona una mascota...</option>
+                        <option th:each="m : ${mascotas}"
+                                th:value="${m.id}"
+                                th:text="${m.nombre + ' (' + m.especie + ' · ' + m.raza + ') — Dueño: ' + m.clienteNombre}">
+                            Luna (Perro) — Dueño: Camila
+                        </option>
+                    </select>
+                    <div class="err" th:if="${#fields.hasErrors('mascotaId')}" th:errors="*{mascotaId}"></div>
+                    <div class="hint">Si la mascota no está en la lista, regístrala previamente en la sección de Mascotas.</div>
+                </div>
+
+                <div class="campo">
+                    <label for="veterinarioId">Médico Veterinario *</label>
+                    <select id="veterinarioId" th:field="*{veterinarioId}" class="fld" th:classappend="${#fields.hasErrors('veterinarioId')} ? 'bad'">
+                        <option value="">Selecciona un profesional...</option>
+                        <option th:each="v : ${veterinarios}"
+                                th:value="${v.id}"
+                                th:text="${v.nombre}">
+                            Dra. Pérez
+                        </option>
+                    </select>
+                    <div class="err" th:if="${#fields.hasErrors('veterinarioId')}" th:errors="*{veterinarioId}"></div>
+                </div>
+
+                <div class="dos">
+                    <div class="campo">
+                        <label for="fecha">Fecha de atención *</label>
+                        <input type="date" id="fecha" th:field="*{fecha}" class="fld" th:classappend="${#fields.hasErrors('fecha')} ? 'bad'">
+                        <div class="err" th:if="${#fields.hasErrors('fecha')}" th:errors="*{fecha}"></div>
+                    </div>
+
+                    <div class="campo">
+                        <label for="hora">Hora de atención *</label>
+                        <input type="time" id="hora" th:field="*{hora}" step="300" class="fld" th:classappend="${#fields.hasErrors('hora')} ? 'bad'">
+                        <div class="err" th:if="${#fields.hasErrors('hora')}" th:errors="*{hora}"></div>
+                        <div class="hint">Ej: 10:00, 10:30, 11:00, etc.</div>
+                    </div>
+                </div>
+
+                <div class="campo" th:if="${reserva.id != null}">
+                    <label for="estado">Estado de la reserva</label>
+                    <select id="estado" th:field="*{estado}" class="fld">
+                        <option th:each="est : ${estados}" th:value="${est}" th:text="${est}">PENDIENTE</option>
+                    </select>
+                    <div class="hint">Al cambiar el estado a CONFIRMADA o CANCELADA, se despacha la notificación por correo al cliente.</div>
+                </div>
+
+                <div class="note">
+                    ℹ️ <strong>Importante:</strong> La clínica atiende a un paciente por bloque horario simultáneo. Si la hora seleccionada ya está ocupada por otra reserva activa, el sistema te avisará para seleccionar otro horario disponible.
+                </div>
+
+                <div class="form-actions">
+                    <a th:href="@{/reservas}" class="btn o">Cancelar</a>
+                    <button type="submit" class="btn p" th:text="${reserva.id == null ? 'Agendar cita' : 'Guardar cambios'}">Agendar cita</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+</body>
+</html>

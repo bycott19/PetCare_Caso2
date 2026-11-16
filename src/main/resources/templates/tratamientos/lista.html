@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Tratamientos')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('tratamientos')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile grape"><svg th:replace="~{fragments/icons :: clipboard}"></svg></span>
+            <div>
+                <h1>Tratamientos y Fichas Médicas</h1>
+                <p>Registro de diagnósticos clínicos y prescripción de fármacos</p>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/tratamientos/nuevo}" class="btn p">+ Registrar tratamiento</a>
+        </div>
+    </div>
+
+    <div class="card filtros">
+        <form th:action="@{/tratamientos}" method="get" class="card-tools">
+            <div class="buscador">
+                <svg th:replace="~{fragments/icons :: search}"></svg>
+                <input type="text" name="q" th:value="${q}" class="in" placeholder="Buscar por paciente, diagnóstico o medicamento recetado">
+            </div>
+            <button type="submit" class="btn o">Buscar</button>
+            <a th:if="${q != null and !#strings.isEmpty(q)}" th:href="@{/tratamientos}" class="btn o">Limpiar</a>
+            <span class="tag ok contador" th:text="${#lists.size(tratamientos)} + ' tratamiento(s)'">0</span>
+        </form>
+    </div>
+
+    <div class="card vacio-card" th:if="${#lists.isEmpty(tratamientos)}">
+        <span class="tile grape"><svg th:replace="~{fragments/icons :: clipboard}"></svg></span>
+        <h3>No hay tratamientos registrados</h3>
+        <p>Aún no se han emitido diagnósticos clínicos para las reservas atendidas.</p>
+        <a th:href="@{/tratamientos/nuevo}" class="btn p">+ Registrar primer tratamiento</a>
+    </div>
+
+    <div class="card" th:unless="${#lists.isEmpty(tratamientos)}">
+        <div class="tw">
+            <table>
+                <thead>
+                <tr>
+                    <th>Fecha</th>
+                    <th>Paciente / Dueño</th>
+                    <th>Veterinario</th>
+                    <th>Diagnóstico</th>
+                    <th>Medicamentos</th>
+                    <th class="der">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="t : ${tratamientos}">
+                    <td>
+                        <strong th:text="${#temporals.format(t.fecha, 'dd/MM/yyyy')}">20/11/2026</strong>
+                        <div class="sub" th:text="${#temporals.format(t.hora, 'HH:mm')} + ' hrs'">10:30 hrs</div>
+                    </td>
+                    <td>
+                        <div class="persona">
+                            <span class="av" th:classappend="${t.mascotaEspecie != null ? t.mascotaEspecie.toLowerCase() : ''}">
+                                <svg th:replace="~{fragments/icons :: paw}"></svg>
+                            </span>
+                            <div>
+                                <strong th:text="${t.mascotaNombre}">Luna</strong>
+                                <div class="sub" th:text="'Dueño: ' + ${t.clienteNombre}">Dueño: Camila</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong th:text="${t.veterinarioNombre}">Dra. Pérez</strong>
+                    </td>
+                    <td>
+                        <span style="font-weight: 700;" th:text="${t.diagnostico}">Infección respiratoria</span>
+                    </td>
+                    <td>
+                        <div th:if="${#lists.isEmpty(t.medicamentos)}" class="sub">Sin fármacos recetados</div>
+                        <div th:unless="${#lists.isEmpty(t.medicamentos)}" style="display: flex; gap: 4px; flex-wrap: wrap;">
+                            <span class="tag lemon" th:each="med : ${t.medicamentos}" th:text="${med.nombre}">Amoxicilina</span>
+                        </div>
+                    </td>
+                    <td class="der">
+                        <div class="btn-row">
+                            <a th:href="@{/tratamientos/{id}(id=${t.id})}" class="btn p sm">Ver ficha completa</a>
+                            <form th:action="@{/tratamientos/{id}/eliminar(id=${t.id})}" method="post"
+                                  onsubmit="return confirm('¿Seguro que deseas eliminar este tratamiento y su receta médica?')">
+                                <button type="submit" class="btn o sm" style="color:#d63c3c;" title="Eliminar tratamiento">✕</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Ficha Médica · ' + ${tratamiento.mascotaNombre})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('tratamientos')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile grape"><svg th:replace="~{fragments/icons :: clipboard}"></svg></span>
+            <div>
+                <h1>Ficha de Atención y Receta</h1>
+                <p th:text="'Atención médica de ' + ${tratamiento.mascotaNombre} + ' · ' + ${#temporals.format(tratamiento.fecha, 'dd/MM/yyyy')}">Atención de Luna</p>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/tratamientos}" class="btn o"><svg th:replace="~{fragments/icons :: arrow}"></svg>Volver a tratamientos</a>
+            <button onclick="window.print()" class="btn o">Imprimir Ficha</button>
+        </div>
+    </div>
+
+    <!-- Perfil del Paciente y la Consulta -->
+    <div class="card perfil">
+        <div class="perfil-color" style="background: var(--teal);">
+            <span class="av big"><svg th:replace="~{fragments/icons :: paw}"></svg></span>
+        </div>
+        <div class="perfil-info">
+            <h2 th:text="${tratamiento.mascotaNombre}">Luna</h2>
+            <dl>
+                <div><dt>Especie</dt><dd th:text="${tratamiento.mascotaEspecie}">Perro</dd></div>
+                <div><dt>Dueño</dt><dd><a th:href="@{/clientes/{id}(id=${tratamiento.clienteId})}" class="enlace" th:text="${tratamiento.clienteNombre}">Camila</a></dd></div>
+                <div><dt>Contacto</dt><dd th:text="${tratamiento.clienteCorreo}">correo@ejemplo.cl</dd></div>
+                <div><dt>Veterinario</dt><dd th:text="${tratamiento.veterinarioNombre}">Dra. Pérez</dd></div>
+                <div><dt>Fecha Atención</dt><dd th:text="${#temporals.format(tratamiento.fecha, 'dd/MM/yyyy') + ' ' + #temporals.format(tratamiento.hora, 'HH:mm')}">20/11/2026 10:30</dd></div>
+            </dl>
+        </div>
+        <div class="perfil-acciones">
+            <span class="tag teal" style="margin: 0 auto;">ATENDIDA</span>
+            <form th:action="@{/tratamientos/{id}/eliminar(id=${tratamiento.id})}" method="post"
+                  onsubmit="return confirm('¿Seguro que deseas eliminar este tratamiento y su receta médica?')">
+                <button type="submit" class="btn danger sm">Eliminar</button>
+            </form>
+        </div>
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr; gap: 24px;">
+        <!-- Diagnóstico y Observaciones -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Diagnóstico Clínico</h3>
+            </div>
+            <div style="font-size: 18px; font-weight: 800; color: #1f9e84; margin-bottom: 16px; background: #ebf9f5; padding: 12px 16px; border-radius: 14px; border: 2.5px solid var(--soft);"
+                 th:text="${tratamiento.diagnostico}">
+                Otitis bacteriana bilateral
+            </div>
+
+            <h3 style="margin-top: 18px; margin-bottom: 8px;">Observaciones y Cuidados</h3>
+            <div style="font-weight: 700; color: var(--ink); white-space: pre-line; line-height: 1.6; background: #fff; padding: 14px; border-radius: 12px; border: 2.5px dashed var(--soft);"
+                 th:text="${tratamiento.descripcion}">
+                Observaciones detalladas...
+            </div>
+        </div>
+
+        <!-- Receta Médica / Medicamentos Prescritos -->
+        <div class="card">
+            <div class="card-head">
+                <h3>Receta de Medicamentos</h3>
+                <span class="tag ok" th:text="${#lists.size(tratamiento.medicamentos)} + ' medicamento(s)'">0</span>
+            </div>
+
+            <div th:if="${#lists.isEmpty(tratamiento.medicamentos)}" class="vacio" style="padding: 24px; text-align: center; color: var(--mu); font-weight: 700;">
+                No se prescribieron medicamentos para este tratamiento.
+            </div>
+
+            <div class="tw" th:unless="${#lists.isEmpty(tratamiento.medicamentos)}">
+                <table>
+                    <thead>
+                    <tr>
+                        <th style="width: 35%;">Medicamento</th>
+                        <th>Indicaciones y Posología</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="m : ${tratamiento.medicamentos}">
+                        <td>
+                            <strong style="font-size: 15px;" th:text="${m.nombre}">Amoxicilina con ácido clavulánico</strong>
+                        </td>
+                        <td>
+                            <span style="font-weight: 700; color: var(--ink);" th:text="${m.indicaciones}">1 comprimido cada 12 hrs por 7 días con comida.</span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</main>
+</body>
+</html>

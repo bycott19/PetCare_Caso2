@@ -12,7 +12,9 @@
             </div>
         </div>
         <div class="acciones">
-            <a th:href="@{/clientes/nuevo}" class="btn">+ Nuevo cliente</a>
+            <a th:href="@{/reservas/nueva}" class="btn p">+ Pedir hora</a>
+            <a th:href="@{/tratamientos/nuevo}" class="btn m">+ Registrar tratamiento</a>
+            <a th:href="@{/clientes/nuevo}" class="btn o">+ Nuevo cliente</a>
             <a th:href="@{/mascotas/nueva}" class="btn o">+ Nueva mascota</a>
             <a th:href="@{/veterinarios/nuevo}" class="btn o">+ Nuevo veterinario</a>
         </div>
@@ -39,38 +41,54 @@
             </div>
             <span class="tile"><svg th:replace="~{fragments/icons :: steth}"></svg></span>
         </a>
+        <a th:href="@{/reservas}" class="stat lemon">
+            <div>
+                <span class="lbl">Reservas</span>
+                <b th:text="${totalReservas}">0</b>
+            </div>
+            <span class="tile"><svg th:replace="~{fragments/icons :: calendar}"></svg></span>
+        </a>
+        <a th:href="@{/tratamientos}" class="stat grape">
+            <div>
+                <span class="lbl">Tratamientos</span>
+                <b th:text="${totalTratamientos}">0</b>
+            </div>
+            <span class="tile"><svg th:replace="~{fragments/icons :: clipboard}"></svg></span>
+        </a>
     </div>
     <div class="dash">
         <div class="card">
             <div class="card-head">
-                <h3>Mascotas recientes</h3>
-                <a th:href="@{/mascotas}" class="btn o sm">Ver todas</a>
+                <h3>Reservas recientes</h3>
+                <a th:href="@{/reservas}" class="btn o sm">Ver todas</a>
             </div>
             <div class="tw">
                 <table>
                     <thead>
                     <tr>
                         <th>Mascota</th>
-                        <th>Edad</th>
-                        <th class="der">Dueño</th>
+                        <th>Fecha y Hora</th>
+                        <th>Veterinario</th>
+                        <th class="der">Estado</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr th:if="${#lists.isEmpty(mascotas)}">
-                        <td colspan="3" class="vacio">Aún no hay mascotas registradas</td>
+                    <tr th:if="${#lists.isEmpty(reservasRecientes)}">
+                        <td colspan="4" class="vacio">No hay reservas registradas</td>
                     </tr>
-                    <tr th:each="m : ${mascotas}">
+                    <tr th:each="r : ${reservasRecientes}">
                         <td>
-                            <div class="persona">
-                                <span class="av" th:classappend="${m.tipo}"><svg th:replace="~{fragments/icons :: paw}"></svg></span>
-                                <div>
-                                    <strong th:text="${m.nombre}">Luna</strong>
-                                    <div class="sub" th:text="${m.especie + ' · ' + m.raza}">Perro · Mestiza</div>
-                                </div>
-                            </div>
+                            <strong th:text="${r.mascotaNombre}">Luna</strong>
+                            <div class="sub" th:text="${r.clienteNombre}">Dueño</div>
                         </td>
-                        <td th:text="${m.edad}">2 años</td>
-                        <td class="der"><a th:href="@{/clientes/{id}(id=${m.clienteId})}" class="enlace" th:text="${m.clienteNombre}">Dueño</a></td>
+                        <td>
+                            <span th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}">20/11/2026</span>
+                            <span class="sub" th:text="' · ' + ${#temporals.format(r.hora, 'HH:mm')}">10:00</span>
+                        </td>
+                        <td th:text="${r.veterinarioNombre}">Veterinario</td>
+                        <td class="der">
+                            <span th:class="${r.estadoBadgeClase}" th:text="${r.estado}">PENDIENTE</span>
+                        </td>
                     </tr>
                     </tbody>
                 </table>

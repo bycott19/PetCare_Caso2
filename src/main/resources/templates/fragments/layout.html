@@ -19,6 +19,10 @@
             <svg th:replace="~{fragments/icons :: paw}"></svg><span>Mascotas</span></a>
         <a th:href="@{/veterinarios}" th:classappend="${activo == 'veterinarios'} ? 'on'">
             <svg th:replace="~{fragments/icons :: steth}"></svg><span>Veterinarios</span></a>
+        <a th:href="@{/reservas}" th:classappend="${activo == 'reservas'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: calendar}"></svg><span>Reservas</span></a>
+        <a th:href="@{/tratamientos}" th:classappend="${activo == 'tratamientos'} ? 'on'">
+            <svg th:replace="~{fragments/icons :: clipboard}"></svg><span>Tratamientos</span></a>
     </nav>
 </aside>
 <th:block th:fragment="alertas">

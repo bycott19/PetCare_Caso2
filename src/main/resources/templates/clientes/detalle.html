@@ -61,6 +61,7 @@
                         <div><dt>Nacimiento</dt><dd th:text="${#temporals.format(m.fechaNacimiento, 'dd/MM/yyyy')}">01/01/2022</dd></div>
                     </dl>
                     <div class="btn-row" style="justify-content: flex-end;">
+                        <a th:href="@{/reservas/nueva(mascotaId=${m.id})}" class="btn p sm">+ Pedir hora</a>
                         <a th:href="@{/mascotas/{id}/editar(id=${m.id})}" class="btn o sm">Editar</a>
                         <form th:action="@{/mascotas/{id}/eliminar(id=${m.id})}" method="post"
                               onsubmit="return confirm('¿Seguro que deseas eliminar esta mascota?')">

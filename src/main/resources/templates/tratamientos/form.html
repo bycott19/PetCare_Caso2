@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head(${tratamiento.id == null ? 'Registrar tratamiento' : 'Modificar tratamiento'})}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('tratamientos')}"></header>
+<main>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile grape"><svg th:replace="~{fragments/icons :: clipboard}"></svg></span>
+            <div>
+                <h1 th:text="${tratamiento.id == null ? 'Registrar Tratamiento y Receta' : 'Modificar Tratamiento'}">Registrar Tratamiento</h1>
+                <p>Emisión de diagnóstico clínico y prescripción médica</p>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/tratamientos}" class="btn o"><svg th:replace="~{fragments/icons :: arrow}"></svg>Volver a tratamientos</a>
+        </div>
+    </div>
+
+    <div class="form-layout" style="max-width: 900px;">
+        <div class="card">
+            <form th:action="@{/tratamientos/guardar}" th:object="${tratamiento}" method="post" id="tratamientoForm">
+                <input type="hidden" th:field="*{id}">
+
+                <div class="alert er" th:if="${#fields.hasGlobalErrors()}">
+                    <p th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error global</p>
+                </div>
+
+                <!-- Selección de Reserva -->
+                <div class="campo">
+                    <label for="reservaId">Cita o Reserva médica asociada *</label>
+                    <select id="reservaId" th:field="*{reservaId}" class="fld" th:classappend="${#fields.hasErrors('reservaId')} ? 'bad'">
+                        <option value="">Selecciona la cita a atender...</option>
+                        <option th:each="r : ${reservasDisponibles}"
+                                th:value="${r.id}"
+                                th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy') + ' ' + #temporals.format(r.hora, 'HH:mm') + ' hrs — Paciente: ' + r.mascotaNombre + ' (' + r.clienteNombre + ') con ' + r.veterinarioNombre}">
+                            20/11/2026 10:30 hrs — Paciente: Luna (Camila) con Dra. Pérez
+                        </option>
+                    </select>
+                    <div class="err" th:if="${#fields.hasErrors('reservaId')}" th:errors="*{reservaId}"></div>
+                    <div class="hint">Al guardar el tratamiento, la reserva pasará automáticamente a estado <strong>ATENDIDA</strong>.</div>
+                </div>
+
+                <!-- Diagnóstico -->
+                <div class="campo">
+                    <label for="diagnostico">Diagnóstico clínico *</label>
+                    <input type="text" id="diagnostico" th:field="*{diagnostico}" class="fld"
+                           placeholder="Ej: Otitis bacteriana bilateral aguda"
+                           th:classappend="${#fields.hasErrors('diagnostico')} ? 'bad'">
+                    <div class="err" th:if="${#fields.hasErrors('diagnostico')}" th:errors="*{diagnostico}"></div>
+                </div>
+
+                <!-- Observaciones y Descripción -->
+                <div class="campo">
+                    <label for="descripcion">Descripción clínica y observaciones *</label>
+                    <textarea id="descripcion" th:field="*{descripcion}" rows="4" class="fld"
+                              placeholder="Detalle de síntomas observados, evolución esperada y recomendaciones de cuidado para el dueño..."
+                              th:classappend="${#fields.hasErrors('descripcion')} ? 'bad'"></textarea>
+                    <div class="err" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></div>
+                </div>
+
+                <!-- Sección Medicamentos Recetados -->
+                <div style="margin-top: 28px; padding-top: 20px; border-top: 3px dashed var(--soft);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 10px;">
+                        <div>
+                            <h3 style="margin: 0;">Prescripción de Medicamentos</h3>
+                            <div class="sub">Busca y añade fármacos del catálogo veterinario oficial</div>
+                        </div>
+                        <button type="button" class="btn o sm" onclick="agregarFilaMedicamento('', '')">+ Fila manual</button>
+                    </div>
+
+                    <!-- Buscador en la API de medicamentos -->
+                    <div class="card" style="background: #f7fcfa; border-width: 2px; margin-bottom: 20px; padding: 16px;">
+                        <label for="buscadorMed" style="margin-bottom: 8px;">Buscar en catálogo veterinario (API):</label>
+                        <div style="display: flex; gap: 10px;">
+                            <div class="buscador" style="min-width: 0;">
+                                <svg th:replace="~{fragments/icons :: search}"></svg>
+                                <input type="text" id="buscadorMed" class="in" placeholder="Escribe el nombre o principio activo (ej: amox, melo, enro)..."
+                                       oninput="consultarApiMedicamentos(this.value)">
+                            </div>
+                        </div>
+                        <div id="resultadosMed" style="margin-top: 12px; display: none;"></div>
+                    </div>
+
+                    <!-- Tabla de Medicamentos recetados -->
+                    <div id="contenedorMedicamentos" style="display: flex; flex-direction: column; gap: 12px;">
+                        <!-- Fila si ya venían medicamentos preexistentes en el modelo -->
+                        <div th:each="m, iter : *{medicamentos}" class="card med-item" style="padding: 14px; border-width: 2px; background: #fff;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                                <strong style="color: var(--ink);">Medicamento prescrito</strong>
+                                <button type="button" class="btn danger sm" onclick="this.closest('.med-item').remove(); reindexar();">Quitar</button>
+                            </div>
+                            <div class="dos" style="gap: 10px;">
+                                <div>
+                                    <label>Nombre del medicamento *</label>
+                                    <input type="text" class="fld med-nombre" th:name="|medicamentos[${iter.index}].nombre|" th:value="${m.nombre}" required>
+                                </div>
+                                <div>
+                                    <label>Indicaciones y dosificación *</label>
+                                    <input type="text" class="fld med-indicaciones" th:name="|medicamentos[${iter.index}].indicaciones|" th:value="${m.indicaciones}" placeholder="Dosis, frecuencia y duración..." required>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="sinMedicamentosMensaje" style="text-align: center; padding: 18px; color: var(--mu); font-weight: 700;"
+                         th:styleappend="${#lists.isEmpty(tratamiento.medicamentos)} ? 'display:block;' : 'display:none;'">
+                        Ningún medicamento añadido aún a la receta. Usa el buscador superior para agregar fármacos.
+                    </div>
+                </div>
+
+                <div class="form-actions" style="margin-top: 28px;">
+                    <a th:href="@{/tratamientos}" class="btn o">Cancelar</a>
+                    <button type="submit" class="btn p">Guardar tratamiento</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+
+<script>
+let debounceTimer;
+
+function consultarApiMedicamentos(valor) {
+    clearTimeout(debounceTimer);
+    const box = document.getElementById('resultadosMed');
+    if (!valor || valor.trim().length < 2) {
+        box.style.display = 'none';
+        box.innerHTML = '';
+        return;
+    }
+
+    debounceTimer = setTimeout(() => {
+        fetch('/api/medicamentos?nombre=' + encodeURIComponent(valor.trim()))
+            .then(res => res.json())
+            .then(data => {
+                box.innerHTML = '';
+                if (!data || data.length === 0) {
+                    box.style.display = 'block';
+                    box.innerHTML = '<div style="font-size: 13px; color: var(--mu); padding: 8px;">No se encontraron medicamentos en el catálogo para "' + valor + '".</div>';
+                    return;
+                }
+
+                box.style.display = 'block';
+                let html = '<div style="display: flex; flex-direction: column; gap: 8px; max-height: 240px; overflow-y: auto;">';
+                data.forEach(med => {
+                    const nombreEsc = med.nombre.replace(/'/g, "\\'");
+                    const indEsc = (med.indicaciones || '').replace(/'/g, "\\'");
+                    html += `
+                        <div style="background: #fff; border: 2px solid var(--soft); border-radius: 12px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center; gap: 10px;">
+                            <div>
+                                <strong style="font-size: 14px; color: var(--ink);">${med.nombre}</strong>
+                                <div style="font-size: 12px; color: var(--mu); margin-top: 2px;">
+                                    ${med.tipo || ''} · ${med.principioActivo || ''} · Especies: ${(med.especies || []).join(', ')}
+                                </div>
+                                <div style="font-size: 11.5px; color: #5a756b; margin-top: 2px;">${med.indicaciones || ''}</div>
+                            </div>
+                            <button type="button" class="btn p sm" onclick="agregarFilaMedicamento('${nombreEsc}', '${indEsc}')">+ Recetar</button>
+                        </div>
+                    `;
+                });
+                html += '</div>';
+                box.innerHTML = html;
+            })
+            .catch(err => {
+                box.style.display = 'block';
+                box.innerHTML = '<div style="font-size: 13px; color: #d63c3c; padding: 8px;">Error al conectar con la API de medicamentos: ' + err.message + '</div>';
+            });
+    }, 250);
+}
+
+function agregarFilaMedicamento(nombre, indicaciones) {
+    const contenedor = document.getElementById('contenedorMedicamentos');
+    const msgVacio = document.getElementById('sinMedicamentosMensaje');
+    if (msgVacio) msgVacio.style.display = 'none';
+
+    const index = contenedor.querySelectorAll('.med-item').length;
+
+    const div = document.createElement('div');
+    div.className = 'card med-item';
+    div.style.cssText = 'padding: 14px; border-width: 2px; background: #fff; margin-bottom: 8px;';
+    div.innerHTML = `
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+            <strong style="color: var(--ink);">Medicamento #${index + 1}</strong>
+            <button type="button" class="btn danger sm" onclick="this.closest('.med-item').remove(); reindexar();">Quitar</button>
+        </div>
+        <div class="dos" style="gap: 10px;">
+            <div>
+                <label>Nombre del medicamento *</label>
+                <input type="text" class="fld med-nombre" name="medicamentos[${index}].nombre" value="${nombre}" required>
+            </div>
+            <div>
+                <label>Indicaciones y dosificación *</label>
+                <input type="text" class="fld med-indicaciones" name="medicamentos[${index}].indicaciones" value="${indicaciones}" placeholder="Ej: 1 comprimido cada 12 hrs por 7 días" required>
+            </div>
+        </div>
+    `;
+
+    contenedor.appendChild(div);
+}
+
+function reindexar() {
+    const contenedor = document.getElementById('contenedorMedicamentos');
+    const items = contenedor.querySelectorAll('.med-item');
+    const msgVacio = document.getElementById('sinMedicamentosMensaje');
+
+    if (items.length === 0 && msgVacio) {
+        msgVacio.style.display = 'block';
+    }
+
+    items.forEach((item, idx) => {
+        const title = item.querySelector('strong');
+        if (title) title.textContent = 'Medicamento #' + (idx + 1);
+
+        const inNombre = item.querySelector('.med-nombre');
+        if (inNombre) inNombre.setAttribute('name', `medicamentos[${idx}].nombre`);
+
+        const inInd = item.querySelector('.med-indicaciones');
+        if (inInd) inInd.setAttribute('name', `medicamentos[${idx}].indicaciones`);
+    });
+}
+</script>
+</body>
+</html>

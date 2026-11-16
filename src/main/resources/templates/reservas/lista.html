@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Reservas')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('reservas')}"></header>
+<main>
+    <th:block th:replace="~{fragments/layout :: alertas}"></th:block>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile lemon"><svg th:replace="~{fragments/icons :: calendar}"></svg></span>
+            <div>
+                <h1>Reservas de Horas</h1>
+                <p>Gestión de citas médicas y atención veterinaria</p>
+            </div>
+        </div>
+        <div class="acciones">
+            <a th:href="@{/reservas/nueva}" class="btn p">+ Pedir hora</a>
+        </div>
+    </div>
+
+    <div class="card filtros">
+        <form th:action="@{/reservas}" method="get" class="card-tools">
+            <select name="veterinarioId" class="in" onchange="this.form.submit()">
+                <option value="">Todos los veterinarios</option>
+                <option th:each="v : ${veterinarios}" th:value="${v.id}" th:text="${v.nombre}"
+                        th:selected="${veterinarioId != null and veterinarioId == v.id}">Veterinario</option>
+            </select>
+
+            <select name="estado" class="in" onchange="this.form.submit()">
+                <option value="">Todos los estados</option>
+                <option th:each="est : ${estados}" th:value="${est}" th:text="${est}"
+                        th:selected="${estadoFiltro != null and estadoFiltro == est}">Estado</option>
+            </select>
+
+            <input type="date" name="fecha" th:value="${fechaFiltro}" class="in" onchange="this.form.submit()" title="Filtrar por fecha">
+
+            <div class="buscador">
+                <svg th:replace="~{fragments/icons :: search}"></svg>
+                <input type="text" name="q" th:value="${q}" class="in" placeholder="Buscar mascota, dueño o veterinario">
+            </div>
+
+            <button type="submit" class="btn o">Buscar</button>
+            <a th:if="${veterinarioId != null or estadoFiltro != null or fechaFiltro != null or (q != null and !#strings.isEmpty(q))}"
+               th:href="@{/reservas}" class="btn o">Limpiar</a>
+            <span class="tag ok contador" th:text="${#lists.size(reservas)} + ' reserva(s)'">0</span>
+        </form>
+    </div>
+
+    <div class="card vacio-card" th:if="${#lists.isEmpty(reservas)}">
+        <span class="tile lemon"><svg th:replace="~{fragments/icons :: calendar}"></svg></span>
+        <h3>No se encontraron reservas</h3>
+        <p>No hay citas que coincidan con los filtros seleccionados.</p>
+        <a th:href="@{/reservas/nueva}" class="btn p">+ Pedir una nueva hora</a>
+    </div>
+
+    <div class="card" th:unless="${#lists.isEmpty(reservas)}">
+        <div class="tw">
+            <table>
+                <thead>
+                <tr>
+                    <th>Fecha y Hora</th>
+                    <th>Mascota / Dueño</th>
+                    <th>Veterinario</th>
+                    <th>Estado</th>
+                    <th>Atención</th>
+                    <th class="der">Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="r : ${reservas}">
+                    <td>
+                        <strong th:text="${#temporals.format(r.fecha, 'dd/MM/yyyy')}">20/11/2026</strong>
+                        <div class="sub" th:text="${#temporals.format(r.hora, 'HH:mm')} + ' hrs'">10:30 hrs</div>
+                    </td>
+                    <td>
+                        <div class="persona">
+                            <span class="av" th:classappend="${r.mascotaEspecie != null ? r.mascotaEspecie.toLowerCase() : ''}">
+                                <svg th:replace="~{fragments/icons :: paw}"></svg>
+                            </span>
+                            <div>
+                                <strong th:text="${r.mascotaNombre}">Luna</strong>
+                                <div class="sub">
+                                    Dueño: <a th:href="@{/clientes/{id}(id=${r.clienteId})}" class="enlace" th:text="${r.clienteNombre}">Camila</a>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <strong th:text="${r.veterinarioNombre}">Dra. Pérez</strong>
+                    </td>
+                    <td>
+                        <span th:class="${r.estadoBadgeClase}" th:text="${r.estado}">PENDIENTE</span>
+                    </td>
+                    <td>
+                        <span th:if="${r.tieneTratamiento}">
+                            <a th:href="@{/tratamientos/{id}(id=${r.tratamientoId})}" class="btn o sm">Ver diagnóstico</a>
+                        </span>
+                        <span th:if="${!r.tieneTratamiento and !r.cancelada}">
+                            <a th:href="@{/tratamientos/nuevo(reservaId=${r.id})}" class="btn m sm">+ Tratamiento</a>
+                        </span>
+                        <span th:if="${r.cancelada}" class="sub">-</span>
+                    </td>
+                    <td class="der">
+                        <div class="btn-row">
+                            <!-- Confirmar -->
+                            <form th:if="${r.pendiente}" th:action="@{/reservas/{id}/confirmar(id=${r.id})}" method="post">
+                                <button type="submit" class="btn p sm" title="Confirmar reserva y notificar cliente">Confirmar</button>
+                            </form>
+                            <!-- Cancelar -->
+                            <form th:if="${!r.cancelada and !r.atendida}" th:action="@{/reservas/{id}/cancelar(id=${r.id})}" method="post"
+                                  onsubmit="return confirm('¿Seguro que deseas cancelar esta hora? Se enviará una notificación por correo al cliente.')">
+                                <button type="submit" class="btn danger sm" title="Cancelar reserva">Cancelar</button>
+                            </form>
+                            <!-- Editar / Reprogramar -->
+                            <a th:if="${!r.atendida}" th:href="@{/reservas/{id}/editar(id=${r.id})}" class="btn o sm" title="Modificar fecha/hora o profesional">Editar</a>
+                            <!-- Eliminar (solo si no tiene tratamiento) -->
+                            <form th:if="${!r.tieneTratamiento}" th:action="@{/reservas/{id}/eliminar(id=${r.id})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar definitivamente este registro de reserva?')">
+                                <button type="submit" class="btn o sm" style="color:#d63c3c;" title="Eliminar">✕</button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+</body>
+</html>

@@ -143,7 +143,7 @@ h3 { font-size: 18px; font-weight: 600; }
 .vacio-card h3, .vacio-card h1 { margin-bottom: 8px; }
 .vacio-card p { color: var(--mu); font-weight: 700; margin-bottom: 18px; }
 .vacio-card .tile { margin: 0 auto 16px; }
-.stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; margin-bottom: 26px; }
+.stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 22px; margin-bottom: 26px; }
 .stat {
   display: flex;
   align-items: center;
@@ -159,6 +159,8 @@ h3 { font-size: 18px; font-weight: 600; }
 .stat.orange { background: #ffd8b0; }
 .stat.mint   { background: #c4f0e2; }
 .stat.sky    { background: #cbe8ff; }
+.stat.lemon  { background: #fff1b8; }
+.stat.grape  { background: #e4d8ff; }
 .stat:hover { box-shadow: 8px 8px 0 var(--ink); }
 .stat .lbl { display: block; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: .05em; }
 .stat b { display: block; margin: 2px 0; font-size: 40px; line-height: 1.1; font-weight: 700; }
@@ -265,6 +267,9 @@ a.enlace:hover, a.enlace:hover strong { text-decoration: underline; }
 }
 .tag.ok { background: #c8f3e4; }
 .tag.gr { background: #f1ece9; color: var(--mu); }
+.tag.lemon { background: #fff0b3; }
+.tag.teal { background: #bdf2e4; }
+.tag.er { background: #ffd0d0; color: #a32222; }
 .av {
   width: 42px;
   height: 42px;
