@@ -9,19 +9,23 @@ const HORA_VALIDA = /^\d{2}:\d{2}(:\d{2})?$/;
 
 export function validarNotificacion(datos) {
   const errores = [];
-  if (!datos || typeof datos !== 'object') {
+  if (!datos || typeof datos !== 'object' || Array.isArray(datos)) {
     return ['El cuerpo de la solicitud debe ser un objeto JSON'];
   }
   if (!TIPOS_NOTIFICACION.includes(datos.tipo)) {
     errores.push(`tipo debe ser uno de: ${TIPOS_NOTIFICACION.join(', ')}`);
   }
-  if (!CORREO_VALIDO.test(datos.destinatario ?? '')) {
+  if (typeof datos.destinatario !== 'string' || !CORREO_VALIDO.test(datos.destinatario)) {
     errores.push('destinatario debe ser un correo válido');
   }
   if (!texto(datos.nombreCliente)) errores.push('nombreCliente es obligatorio');
   if (!texto(datos.nombreMascota)) errores.push('nombreMascota es obligatorio');
-  if (!FECHA_VALIDA.test(datos.fecha ?? '')) errores.push('fecha debe tener formato AAAA-MM-DD');
-  if (!HORA_VALIDA.test(datos.hora ?? '')) errores.push('hora debe tener formato HH:mm');
+  if (typeof datos.fecha !== 'string' || !FECHA_VALIDA.test(datos.fecha)) {
+    errores.push('fecha debe tener formato AAAA-MM-DD');
+  }
+  if (typeof datos.hora !== 'string' || !HORA_VALIDA.test(datos.hora)) {
+    errores.push('hora debe tener formato HH:mm');
+  }
   if (datos.reservaId !== undefined && !Number.isInteger(datos.reservaId)) {
     errores.push('reservaId debe ser un número entero');
   }

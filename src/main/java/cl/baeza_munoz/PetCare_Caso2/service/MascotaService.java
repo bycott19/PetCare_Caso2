@@ -42,7 +42,7 @@ public class MascotaService {
 
     
     public List<MascotaDto> listarPorCliente(Long clienteId) {
-        clienteService.buscarEntidad(clienteId); // valida que exista
+        clienteService.buscarEntidad(clienteId);
         return mascotaRepository.listarPorCliente(clienteId).stream().map(this::toDto).toList();
     }
 

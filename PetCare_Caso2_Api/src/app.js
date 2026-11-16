@@ -7,8 +7,6 @@ const app = express();
 const PORT = Number(process.env.PORT ?? 3000);
 const HOST = process.env.HOST ?? '0.0.0.0';
 
-app.use(express.json());
-
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', process.env.CORS_ORIGIN ?? '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
@@ -19,7 +17,8 @@ app.use((req, res, next) => {
 
 app.use((req, res, next) => {
   const inicio = Date.now();
-  res.on('finish', () => console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode} (${Date.now() - inicio} ms)`));
+  const ruta = req.path;
+  res.on('finish', () => console.log(`${req.method} ${ruta} -> ${res.statusCode} (${Date.now() - inicio} ms)`));
   next();
 });
 
@@ -38,6 +37,9 @@ app.use((req, res) => {
 app.use((err, req, res, next) => {
   if (err.type === 'entity.parse.failed') {
     return res.status(400).json({ error: 'El cuerpo de la solicitud no es un JSON válido' });
+  }
+  if (err.type === 'entity.too.large') {
+    return res.status(413).json({ error: 'El cuerpo de la solicitud supera el tamaño permitido' });
   }
   console.error(err);
   res.status(500).json({ error: 'Error interno de la API' });

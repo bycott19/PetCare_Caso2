@@ -4,7 +4,11 @@ import { buscarMedicamentos, obtenerMedicamento } from '../services/medicamentos
 const router = Router();
 
 router.get('/', (req, res) => {
-  const resultados = buscarMedicamentos({ nombre: req.query.nombre, especie: req.query.especie });
+  const { nombre, especie } = req.query;
+  if ([nombre, especie].some((valor) => valor !== undefined && typeof valor !== 'string')) {
+    return res.status(400).json({ error: 'Cada filtro debe tener un solo valor de texto' });
+  }
+  const resultados = buscarMedicamentos({ nombre, especie });
   res.json({ total: resultados.length, resultados });
 });
 

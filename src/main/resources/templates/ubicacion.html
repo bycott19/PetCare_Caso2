@@ -15,27 +15,35 @@
         <p>No pudimos cargar los datos de la clínica. Intenta nuevamente.</p>
         <a class="btn o" th:href="@{/ubicacion}">Reintentar</a>
     </div>
-    <div class="ubicacion-layout" th:if="${ubicacion != null}">
+    <th:block th:if="${ubicacion != null}">
         <section class="card">
-            <h2 th:text="${ubicacion.nombre}">Clínica Veterinaria PetCare</h2>
+            <div class="card-head ubicacion-card-head">
+                <h2 th:text="${ubicacion.nombre}">Clínica Veterinaria PetCare</h2>
+                <a class="btn p" th:if="${ubicacion.mapa.comoLlegarUrl != null}"
+                   th:href="${ubicacion.mapa.comoLlegarUrl}" target="_blank" rel="noopener">Cómo llegar</a>
+            </div>
             <dl class="ubicacion-datos">
-                <dt>Dirección</dt>
-                <dd>
-                    <span th:text="${ubicacion.direccion}"></span><br>
-                    <span th:text="|${ubicacion.comuna}, ${ubicacion.region}|"></span>
-                </dd>
-                <dt>Horario</dt>
-                <dd th:text="${ubicacion.horario}"></dd>
-                <dt>Teléfono</dt>
-                <dd th:text="${ubicacion.telefono}"></dd>
+                <div>
+                    <dt>Dirección</dt>
+                    <dd>
+                        <span th:text="${ubicacion.direccion}"></span><br>
+                        <span th:text="|${ubicacion.comuna}, ${ubicacion.region}|"></span>
+                    </dd>
+                </div>
+                <div>
+                    <dt>Horario</dt>
+                    <dd th:text="${ubicacion.horario}"></dd>
+                </div>
+                <div>
+                    <dt>Teléfono</dt>
+                    <dd th:text="${ubicacion.telefono}"></dd>
+                </div>
             </dl>
-            <a class="btn p" th:if="${ubicacion.mapa.comoLlegarUrl != null}"
-               th:href="${ubicacion.mapa.comoLlegarUrl}" target="_blank" rel="noopener">Cómo llegar</a>
         </section>
         <div class="card ubicacion-mapa">
             <iframe th:src="${ubicacion.mapa.embedUrl}" title="Mapa de la ubicación de PetCare"></iframe>
         </div>
-    </div>
+    </th:block>
 </main>
 </body>
 </html>
