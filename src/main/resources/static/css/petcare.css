@@ -168,6 +168,22 @@ h3 { font-size: 18px; font-weight: 600; }
 .stat .tile { width: 60px; height: 60px; font-size: 30px; background: #fff; }
 .dash { display: grid; grid-template-columns: minmax(0, 3fr) minmax(280px, 2fr); gap: 22px; align-items: stretch; }
 .dash .card { height: 100%; }
+.ubicacion-card-head { flex-wrap: wrap; }
+.ubicacion-datos {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 14px 24px;
+}
+.ubicacion-datos dt {
+  color: var(--mu);
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.ubicacion-datos dd { margin-top: 2px; font-weight: 800; }
+.ubicacion-mapa { display: flex; overflow: hidden; padding: 0; margin-top: 22px; }
+.ubicacion-mapa iframe { width: 100%; height: clamp(520px, 72vh, 760px); border: 0; }
 .perfil { display: flex; align-items: stretch; padding: 0; margin-bottom: 30px; overflow: hidden; }
 .perfil-color {
   display: grid;
@@ -350,6 +366,7 @@ label { display: block; margin-bottom: 6px; font-size: 12px; font-weight: 800; t
   .dash, .form-layout { grid-template-columns: 1fr; }
 }
 @media (max-width: 860px) {
+  .ubicacion-mapa iframe { height: clamp(340px, 58vh, 490px); }
   .sidebar {
     position: sticky;
     top: 0;

@@ -4,8 +4,8 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title th:text="${titulo} + ' · PetCare'">PetCare</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233ec9a7'%3E%3Cellipse cx='12' cy='16.4' rx='4.8' ry='4'/%3E%3Cellipse cx='5.4' cy='10.6' rx='2.1' ry='2.5'/%3E%3Cellipse cx='9.2' cy='6.2' rx='2.1' ry='2.5'/%3E%3Cellipse cx='14.8' cy='6.2' rx='2.1' ry='2.5'/%3E%3Cellipse cx='18.6' cy='10.6' rx='2.1' ry='2.5'/%3E%3C/svg%3E">
-    <link rel="stylesheet" th:href="@{/css/petcare.css?v=3}">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%233ec9a7'%3E%3Cellipse cx='12' cy='16.4' rx='4.8' ry='4'/%3E%3Cellipse cx='5.4' cy='10.6' rx='2.1' ry='2.5'/%3E%3Cellipse cx='9.2' cy='6.2' rx='2.1' ry='2.5'/%3E%3Cellipse cx='18.6' cy='10.6' rx='2.1' ry='2.5'/%3E%3C/svg%3E">
+    <link rel="stylesheet" th:href="@{/css/petcare.css?v=7}">
 </head>
 <body>
 <aside class="sidebar" th:fragment="header(activo)">
@@ -19,10 +19,15 @@
             <svg th:replace="~{fragments/icons :: paw}"></svg><span>Mascotas</span></a>
         <a th:href="@{/veterinarios}" th:classappend="${activo == 'veterinarios'} ? 'on'">
             <svg th:replace="~{fragments/icons :: steth}"></svg><span>Veterinarios</span></a>
-        <a th:href="@{/reservas}" th:classappend="${activo == 'reservas'} ? 'on'">
+        <a th:href="@{/reservas}" th:classappend="${activo == 'reservas'} ? 'on'"
+           th:attr="aria-current=${activo == 'reservas'} ? 'page' : null">
             <svg th:replace="~{fragments/icons :: calendar}"></svg><span>Reservas</span></a>
-        <a th:href="@{/tratamientos}" th:classappend="${activo == 'tratamientos'} ? 'on'">
+        <a th:href="@{/tratamientos}" th:classappend="${activo == 'tratamientos'} ? 'on'"
+           th:attr="aria-current=${activo == 'tratamientos'} ? 'page' : null">
             <svg th:replace="~{fragments/icons :: clipboard}"></svg><span>Tratamientos</span></a>
+        <a th:href="@{/ubicacion}" th:classappend="${activo == 'ubicacion'} ? 'on'"
+           th:attr="aria-current=${activo == 'ubicacion'} ? 'page' : null">
+            <svg th:replace="~{fragments/icons :: pin}"></svg><span>Ubicación</span></a>
     </nav>
 </aside>
 <th:block th:fragment="alertas">

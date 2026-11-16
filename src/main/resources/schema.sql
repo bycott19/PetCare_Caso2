@@ -26,7 +26,6 @@ CREATE TABLE veterinario (
 );
 
 -- Cada fila representa una hora que el profesional ofrece semanalmente.
--- No se impone una jornada ni una duracion de consulta que el caso no define.
 CREATE TABLE horario_veterinario (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     veterinario_id BIGINT NOT NULL REFERENCES veterinario(id) ON DELETE RESTRICT,
@@ -48,7 +47,6 @@ CREATE TABLE reserva (
 CREATE INDEX ix_reserva_mascota ON reserva(mascota_id);
 CREATE INDEX ix_reserva_veterinario_fecha ON reserva(veterinario_id, fecha);
 -- Regla del enunciado: un solo cupo por fecha/hora en toda la clinica.
--- Tambien evita duplicados cuando llegan dos solicitudes simultaneamente.
 CREATE UNIQUE INDEX uq_reserva_fecha_hora_ocupada
     ON reserva(fecha, hora) WHERE estado <> 'CANCELADA';
 
@@ -60,7 +58,6 @@ CREATE TABLE tratamiento (
     descripcion TEXT NOT NULL CHECK (btrim(descripcion) <> '')
 );
 
--- Un tratamiento puede tener cero, uno o varios medicamentos.
 CREATE TABLE medicamento_prescrito (
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     tratamiento_id BIGINT NOT NULL REFERENCES tratamiento(id) ON DELETE RESTRICT,

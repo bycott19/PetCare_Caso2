@@ -40,15 +40,15 @@ async function enviarCorreo(notificacion) {
       secure: process.env.SMTP_SECURE === 'true',
       auth: process.env.SMTP_USER ? { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS } : undefined,
     });
-    const info = await transporte.sendMail({
+    await transporte.sendMail({
       from: process.env.SMTP_FROM ?? process.env.SMTP_USER,
       to: notificacion.destinatario,
       subject: notificacion.asunto,
       text: notificacion.mensaje,
     });
-    return { estado: 'ENVIADA', detalle: `Correo enviado (${info.messageId})` };
-  } catch (error) {
-    return { estado: 'FALLIDA', detalle: `No se pudo enviar el correo: ${error.message}` };
+    return { estado: 'ENVIADA', detalle: 'Correo enviado.' };
+  } catch {
+    return { estado: 'FALLIDA', detalle: 'No se pudo enviar el correo.' };
   }
 }
 
@@ -58,7 +58,7 @@ export async function enviarNotificacion(datos) {
   notificacion.estado = resultado.estado;
   notificacion.detalleEnvio = resultado.detalle;
   historial.unshift(notificacion);
-  console.log(`[notificacion #${notificacion.id}] ${notificacion.tipo} -> ${notificacion.destinatario} (${notificacion.estado})`);
+  console.log(`[notificacion #${notificacion.id}] ${notificacion.tipo} (${notificacion.estado})`);
   return notificacion;
 }
 

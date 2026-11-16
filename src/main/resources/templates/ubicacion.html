@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="es">
+<head th:replace="~{fragments/layout :: head('Ubicación')}"></head>
+<body>
+<header th:replace="~{fragments/layout :: header('ubicacion')}"></header>
+<main>
+    <div class="page-head">
+        <div class="ph-title">
+            <span class="tile mint"><svg th:replace="~{fragments/icons :: pin}"></svg></span>
+            <h1>Ubicación de la clínica</h1>
+        </div>
+    </div>
+    <div class="card vacio-card" th:if="${ubicacion == null}">
+        <h2>Ubicación no disponible</h2>
+        <p>No pudimos cargar los datos de la clínica. Intenta nuevamente.</p>
+        <a class="btn o" th:href="@{/ubicacion}">Reintentar</a>
+    </div>
+    <th:block th:if="${ubicacion != null}">
+        <section class="card">
+            <div class="card-head ubicacion-card-head">
+                <h2 th:text="${ubicacion.nombre}">Clínica Veterinaria PetCare</h2>
+                <a class="btn p" th:if="${ubicacion.mapa.comoLlegarUrl != null}"
+                   th:href="${ubicacion.mapa.comoLlegarUrl}" target="_blank" rel="noopener">Cómo llegar</a>
+            </div>
+            <dl class="ubicacion-datos">
+                <div>
+                    <dt>Dirección</dt>
+                    <dd>
+                        <span th:text="${ubicacion.direccion}"></span><br>
+                        <span th:text="|${ubicacion.comuna}, ${ubicacion.region}|"></span>
+                    </dd>
+                </div>
+                <div>
+                    <dt>Horario</dt>
+                    <dd th:text="${ubicacion.horario}"></dd>
+                </div>
+                <div>
+                    <dt>Teléfono</dt>
+                    <dd th:text="${ubicacion.telefono}"></dd>
+                </div>
+            </dl>
+        </section>
+        <div class="card ubicacion-mapa">
+            <iframe th:src="${ubicacion.mapa.embedUrl}" title="Mapa de la ubicación de PetCare"></iframe>
+        </div>
+    </th:block>
+</main>
+</body>
+</html>

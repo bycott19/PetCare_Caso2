@@ -60,3 +60,5 @@ npm install
 npm start
 ```
 El microservicio escuchará en `http://localhost:3000`.
+
+En la web principal, el menú **Ubicación** consulta el microservicio y muestra los datos de la clínica y el mapa de OpenStreetMap. Si ejecutas Node en otro equipo de la red, configura `PETCARE_API_BASE_URL=http://IP_DEL_EQUIPO:3000` en el `.env` del proyecto Spring Boot y vuelve a iniciar Spring Boot. El mapa necesita internet para cargar.
